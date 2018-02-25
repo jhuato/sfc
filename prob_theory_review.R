@@ -179,7 +179,7 @@ condpxgiveny
 # Test:
 condpxgiveny == pxgiveny
 
-# In-class exercises
+# In-class exercise
 x <- c(0, 1)
 y <- c(10, 20, 30)
 
