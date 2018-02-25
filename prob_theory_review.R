@@ -136,20 +136,21 @@ popsdx(x, margpx)*popsdx(y, margpy)
 popcorrelxy <- popcovxy/( popsdx(x, margpx) * popsdx(y, margpy) )
 popcorrelxy
 
-# Bayes theorem DEBUG THIS...
+# Bayes theorem
 x
 y
 pxy
 margpx
+margpy
 pygivenx
 pxgiveny
 
 condpxgiveny <- matrix(0, n, m)
+condpxgiveny
 for (i in 1:n) { for (j in 1:m) {
-  condpxgiveny[i, j] <- margpx[i]*(pxy[i,j]/sum(margpx*pygivenx[,j]))
+  condpxgiveny[i, j] <- margpx[i]*(pygivenx[i,j]/sum(margpx*pygivenx[,j]))
 } }
 condpxgiveny
-pxgiveny
-pxy[1,1]
-margpx[1]*(pxy[1,1]/sum(margpx*pygivenx[,1]))
-margpx[1]*(pxy[1,1]/sum(margpx*pygivenx[,1]))
+
+# Test:
+condpxgiveny == pxgiveny
