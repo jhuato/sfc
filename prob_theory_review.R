@@ -1,11 +1,11 @@
 # Review of Probability Theory
 # Julio Huato / SFC
 
-# My functions to compute (1) the length of the sample space of a r.v., 
-# (2) its expected value, (3) its variance, (4) its standard deviation, 
-# and (5) coefficient of variation.  These are all POPULATION stats.
+# My functions to compute (0) the length of the sample space of a r.v., 
+# (1) its expected value, (2) its variance, (3) its standard deviation, 
+# and (4) coefficient of variation:
 
-# Test that the sum of prob = 1.
+# Test that sum(p) = 1.
 testp <- function(p){
   sum(p) == 1
 }
@@ -104,31 +104,52 @@ pxgiveny
 # conditional variances, and conditional standard
 # deviations of y given each value of x.
 
-# DEBUG FROM HERE...
-
 Eygivenx <- rep(0, n)
 varygivenx <- rep(0, n)
+sdygivenx <- rep(0, n)
 for (i in 1:n) { 
-  Eygivenx[i] <- popEx(pygivenx[i], y)  
-  varygivenx[i] <- popvarx(pygivenx[i], y)
+  Eygivenx[i] <- popEx(y, pygivenx[i,])  
+  varygivenx[i] <- popvarx(y, pygivenx[i,])
+  sdygivenx[i] <- popsdx(y, pygivenx[i,])
     }
 Eygivenx
 varygivenx
-popvarx(pygivenx[1], y)
+sdygivenx
 
-popvarx(y, margpy)
-margpy
+# Run to compute the population covariance and 
+# correlation between x and y:
+
+devx <-  rep(0, n)
+devy <-  rep(0, m)
+popcovxy1 <- matrix(0, n, m)
+popcovxy <- 0
+for (i in 1:n) { 
+  for (j in 1:m) {
+    devx[i] <- x[i]- popEx( x, margpx )
+    devy[j] <- y[j]- popEx( y, margpy )
+    popcovxy1[i, j] <- sum( pxy[i, j]*devx[i]*devy[j] )
+    popcovxy <- sum(popcovxy1)
+  } } 
+popcovxy
+
+popsdx(x, margpx)*popsdx(y, margpy)
+popcorrelxy <- popcovxy/( popsdx(x, margpx) * popsdx(y, margpy) )
+popcorrelxy
+
+# Bayes theorem DEBUG THIS...
+x
 y
+pxy
+margpx
+pygivenx
+pxgiveny
 
-
-
-
-# Run to compute the conditional probabilities of
-# x taking each value given each value of y:
-
-# Population covariance and correlation between x and y
-
-
-
-
-
+condpxgiveny <- matrix(0, n, m)
+for (i in 1:n) { for (j in 1:m) {
+  condpxgiveny[i, j] <- margpx[i]*(pxy[i,j]/sum(margpx*pygivenx[,j]))
+} }
+condpxgiveny
+pxgiveny
+pxy[1,1]
+margpx[1]*(pxy[1,1]/sum(margpx*pygivenx[,1]))
+margpx[1]*(pxy[1,1]/sum(margpx*pygivenx[,1]))
