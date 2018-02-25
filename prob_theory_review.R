@@ -83,9 +83,18 @@ for (i in 1:n) {
   for (j in 1:m) { 
     margpx[i] <- sum(pxy[i,])
     margpy[j] <- sum(pxy[,j])
-      } }
+  } }
 margpx
 margpy
+
+# Run to compute the unconditioned expectations,
+# variances, and stand devs.
+popEx(x, margpx)
+popvarx(x, margpx)
+popsdx(x, margpx)
+popEx(y, margpy)
+popvarx(y, margpy)
+popsdx(y, margpy)
 
 # Run the following to compute the conditional
 # probabilities of y taking each value given each 
@@ -102,8 +111,8 @@ pxgiveny
 
 # Run to compute the conditional expectations, 
 # conditional variances, and conditional standard
-# deviations of y given each value of x.
-
+# deviations of y given each value of x, and of
+# x given each value of y.
 Eygivenx <- rep(0, n)
 varygivenx <- rep(0, n)
 sdygivenx <- rep(0, n)
@@ -111,14 +120,29 @@ for (i in 1:n) {
   Eygivenx[i] <- popEx(y, pygivenx[i,])  
   varygivenx[i] <- popvarx(y, pygivenx[i,])
   sdygivenx[i] <- popsdx(y, pygivenx[i,])
-    }
+}
 Eygivenx
 varygivenx
 sdygivenx
 
+Exgiveny <- rep(0, m)
+varxgiveny <- rep(0, m)
+sdxgiveny <- rep(0, m)
+for (j in 1:m) { 
+  Exgiveny[j] <- popEx(x, pxgiveny[,j])  
+  varxgiveny[j] <- popvarx(x, pxgiveny[,j])
+  sdxgiveny[j] <- popsdx(x, pxgiveny[,j])
+}
+Exgiveny
+varygivenx
+sdygivenx
+
+# Law of iterated expectations:
+popEx(Eygivenx, margpx) == popEx(y, margpy)
+popEx(Exgiveny, margpy) == popEx(x, margpx)
+
 # Run to compute the population covariance and 
 # correlation between x and y:
-
 devx <-  rep(0, n)
 devy <-  rep(0, m)
 popcovxy1 <- matrix(0, n, m)
@@ -154,3 +178,79 @@ condpxgiveny
 
 # Test:
 condpxgiveny == pxgiveny
+
+# In-class exercises
+x <- c(0, 1)
+y <- c(10, 20, 30)
+
+pxy <- c(0.10, 0.20, 0.05, 0.05, 0.35, 0.25)
+
+# Determine the unconditional (or plain) standard deviations of
+# x and y, respectively. Compute the marginals first.
+
+n=length(x)
+m=length(y)
+pxy <- matrix(unlist(pxy, n*m), ncol = m, byrow = TRUE)
+pxy
+margpx <- rep(0, n)
+margpy <- rep(0, m)
+for (i in 1:n) {
+  for (j in 1:m) { 
+    margpx[i] <- sum(pxy[i,])
+    margpy[j] <- sum(pxy[,j])
+  } }
+margpx
+margpy
+popEx(x, margpx)
+popEx(y, margpy)
+popvarx(x, margpx)
+popvarx(y, margpy)
+popsdx(x, margpx)
+popsdx(y, margpy)
+
+# Run the following to compute the conditional
+# probabilities of y taking each value given each 
+# value of x:
+pygivenx <- matrix(0, n, m)
+pxgiveny <- matrix(0, n, m)
+for (i in 1:n) {
+  for (j in 1:m) { 
+    pygivenx[i, j] <- pxy[i,j]/margpx[i]
+    pxgiveny[i, j] <- pxy[i,j]/margpy[j]
+  } }
+pygivenx
+pxgiveny
+
+# Run to compute the conditional expectations, 
+# conditional variances, and conditional standard
+# deviations of y given each value of x.
+Eygivenx <- rep(0, n)
+varygivenx <- rep(0, n)
+sdygivenx <- rep(0, n)
+for (i in 1:n) { 
+  Eygivenx[i] <- popEx(y, pygivenx[i,])  
+  varygivenx[i] <- popvarx(y, pygivenx[i,])
+  sdygivenx[i] <- popsdx(y, pygivenx[i,])
+}
+Eygivenx
+varygivenx
+sdygivenx
+
+# Run to compute the population covariance and 
+# correlation between x and y:
+devx <-  rep(0, n)
+devy <-  rep(0, m)
+popcovxy1 <- matrix(0, n, m)
+popcovxy <- 0
+for (i in 1:n) { 
+  for (j in 1:m) {
+    devx[i] <- x[i]- popEx( x, margpx )
+    devy[j] <- y[j]- popEx( y, margpy )
+    popcovxy1[i, j] <- sum( pxy[i, j]*devx[i]*devy[j] )
+    popcovxy <- sum(popcovxy1)
+  } } 
+popcovxy
+
+popsdx(x, margpx)*popsdx(y, margpy)
+popcorrelxy <- popcovxy/( popsdx(x, margpx) * popsdx(y, margpy) )
+popcorrelxy
